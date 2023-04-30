@@ -3,28 +3,6 @@ import time
 
 RelayPin = 18
 
-# Define Const
-simple_meters = [
-    "2/2",  # Cut time or Alla breve
-    "2/4",
-    "2/8",
-    "3/2",
-    "3/4",
-    "3/8",
-    "4/2",
-    "4/4",  # Common time
-    "4/8",
-]
-
-compound_meters = [
-    "6/4",
-    "6/8",
-    "9/4",
-    "9/8",
-    "12/4",
-    "12/8",
-]
-
 
 def setup():
     GPIO.setmode(GPIO.BCM)
@@ -34,23 +12,79 @@ def setup():
 
 def play_metronome(bpm, time_signature):
     interval = 60.0 / bpm
-    beats_per_measure, beat_duration = map(int, time_signature.split('/'))
-    beats = beats_per_measure * (beat_duration // 4)
+    beats_per_measure, count_unit = map(int, time_signature.split('/'))
+    note_duration = 1/count_unit
 
-    count = 1
+    if beats_per_measure in list({2,3,4}):
+        meter = str("simple")
+    elif beats_per_measure in list({6,9,12}):
+        meter = str("compound")
+    else:
+        meter = str("complex")
+
+    if beats_per_measure in list({2,6}):
+        meter_name = str("duple")
+    elif beats_per_measure in list({3,9}):
+        meter_name = str("triple")
+    elif beats_per_measure in list({4,12}):
+        meter_name = str("quadruple")
+    else:
+        meter_name = str("complex")
+    count = 0
+
     while True:
-        if time_signature in simple_meters:
-            if count % beats == 1:
-                print("Downbeat")
-            else:
-                print(count % beats or beats)
-        else:
+        if meter == "simple":
+            if meter_name == "duple":
+                if count % 2 == 0 or count / count_unit == 0:
+                    print("Strong")
+                else:
+                    print(1+count % 2)
 
-            #Compound meters still doesn't print out correctly
-            if count % beats == 1 or count % (beats // 2) == 1:
-                print("Downbeat")
+            elif meter_name == "triple":
+                if count % 3 == 0 or count / count_unit == 0:
+                    print("Strong")
+                else:
+                    print(1 + count % 3)
+
             else:
-                print(count % beats or beats)
+                if count % 4 == 0 or (count+2) % count_unit == 0:
+                    if (count+2) % count_unit == 0:
+                        print("Medium Strong")
+                    else:
+                        print("Strong")
+                else:
+                    print(1 + count % 4)
+
+        elif meter == "compound":
+
+            if meter_name == "duple":
+                if count % 2 == 0 or count / count_unit == 0:
+                    if count / count_unit == 0:
+                        print("Strong")
+                else:
+                    print(1 + count % 2)
+            elif meter_name == "triple":
+                if count % 3 == 0 or count / count_unit == 0:
+                    if count / count_unit == 0:
+                        print("Strong")
+                else:
+                    print(1 + count % 3)
+            else:
+                if count % 4 == 0 or count / (count_unit/2) == 0:
+                    if count / (count_unit/2) == 0:
+                        print("Strong")
+                    else:
+                        print("Medium Strong")
+                else:
+                    print(1 + count % 4)
+
+            #beats = beats_per_measure * (beat_duration // 3)
+            #Compound meters still doesn't print out correctly
+            # if count % beats == 1:
+            #     print("Accent")
+            # else:
+            #     print(count % beats)
+            #print('Not Supported yet')
 
         GPIO.output(RelayPin, GPIO.HIGH)
         time.sleep(interval / 2)
