@@ -13,7 +13,6 @@ def setup():
 def play_metronome(bpm, time_signature):
     interval = 60.0 / bpm
     beats_per_measure, count_unit = map(int, time_signature.split('/'))
-    note_duration = 1/count_unit
 
     if beats_per_measure in list({2,3,4}):
         meter = str("simple")
@@ -57,34 +56,33 @@ def play_metronome(bpm, time_signature):
 
         elif meter == "compound":
 
+
             if meter_name == "duple":
-                if count % 2 == 0 or count / count_unit == 0:
-                    if count / count_unit == 0:
-                        print("Strong")
-                else:
-                    print(1 + count % 2)
-            elif meter_name == "triple":
-                if count % 3 == 0 or count / count_unit == 0:
-                    if count / count_unit == 0:
-                        print("Strong")
-                else:
-                    print(1 + count % 3)
-            else:
-                if count % 4 == 0 or count / (count_unit/2) == 0:
-                    if count / (count_unit/2) == 0:
+                if count % 3 == 0:
+                    if count % beats_per_measure == 0 or (count+2) % (beats_per_measure) == 0:
                         print("Strong")
                     else:
                         print("Medium Strong")
                 else:
-                    print(1 + count % 4)
+                    print(1 + count % beats_per_measure)
 
-            #beats = beats_per_measure * (beat_duration // 3)
-            #Compound meters still doesn't print out correctly
-            # if count % beats == 1:
-            #     print("Accent")
-            # else:
-            #     print(count % beats)
-            #print('Not Supported yet')
+            elif meter_name == "triple":
+                if count % 3 == 0:
+                    if count % beats_per_measure == 0 or (count + 2) % (beats_per_measure) == 0:
+                        print("Strong")
+                    else:
+                        print("Medium Strong")
+                else:
+                    print(1 + count % beats_per_measure)
+            else:
+                if count % 3 ==0:
+                    if count % beats_per_measure == 0 or (count + 2) % (beats_per_measure) == 0:
+                        print("Strong")
+                    else:
+                        print("Medium Strong")
+                else:
+                    print(1 + count % beats_per_measure)
+
 
         GPIO.output(RelayPin, GPIO.HIGH)
         time.sleep(interval / 2)
