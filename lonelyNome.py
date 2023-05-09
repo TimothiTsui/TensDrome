@@ -1,6 +1,7 @@
 import RPi.GPIO as GPIO
 import time
-
+import subprocess
+import LCD1602
 RelayPin = 18
 
 
@@ -8,7 +9,7 @@ def setup():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(RelayPin, GPIO.OUT)
     GPIO.output(RelayPin, GPIO.LOW)
-
+    LCD1602.init(0x27, 1)
 
 def play_metronome(bpm, time_signature):
     interval = 60.0 / bpm
@@ -89,12 +90,17 @@ def play_metronome(bpm, time_signature):
         GPIO.output(RelayPin, GPIO.LOW)
         time.sleep(interval / 2)
 
-        count += 1
+        line_1 = "BPM: " + str(bpm)
+        line_2 = "Time Sig: " + time_signature
+        LCD1602.write(0, 0, line_1)
+        LCD1602.write(0, 1, line_2)
 
+        count += 1
 
 def destroy():
     GPIO.output(RelayPin, GPIO.LOW)
     GPIO.cleanup()
+    LCD1602.clear()
 
 
 if __name__ == "__main__":
@@ -109,6 +115,9 @@ if __name__ == "__main__":
             raise ValueError("Invalid time signature format.")
 
         play_metronome(bpm, time_signature)
+
+
+
     except ValueError as ve:
         print(ve)
     except KeyboardInterrupt:

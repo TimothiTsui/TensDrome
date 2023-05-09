@@ -2,6 +2,7 @@ import RPi.GPIO as GPIO
 import time
 import threading
 import json
+import LCD1602
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
 
@@ -22,6 +23,7 @@ config = {
 class MetronomeGPIO:
     def __init__(self, RelayPin):
         self.RelayPin = RelayPin
+        LCD1602.init(0x27, 1)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(RelayPin, GPIO.OUT)
         GPIO.output(RelayPin, GPIO.LOW)
@@ -31,6 +33,7 @@ class MetronomeGPIO:
 
     def cleanup(self):
         GPIO.cleanup()
+        LCD1602.clear()
 
 
 class AWSIoTClient:
@@ -120,6 +123,11 @@ class MetronomeController:
                     meter_name = "quadruple"
                 else:
                     meter_name = "complex"
+
+                line_1 = "BPM: " + str(current_bpm)
+                line_2 = "Time Sig: " + current_time_signature
+                LCD1602.write(0, 0, line_1)
+                LCD1602.write(0, 1, line_2)
 
             # ... (Rest of your play_metronome function) ...
 
