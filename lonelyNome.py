@@ -2,13 +2,14 @@ import RPi.GPIO as GPIO
 import time
 import subprocess
 import LCD1602
-RelayPin = 18
+StrongPin = 23
+MediumPin = 24
 
 
 def setup():
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(RelayPin, GPIO.OUT)
-    GPIO.output(RelayPin, GPIO.LOW)
+    GPIO.setup(StrongPin, GPIO.OUT)
+    GPIO.setup(MediumPin, GPIO.OUT)
     LCD1602.init(0x27, 1)
 
 def play_metronome(bpm, time_signature):
@@ -33,27 +34,57 @@ def play_metronome(bpm, time_signature):
     count = 0
 
     while True:
+        GPIO.output(StrongPin, GPIO.LOW)
+        GPIO.output(MediumPin, GPIO.LOW)
         if meter == "simple":
             if meter_name == "duple":
                 if count % 2 == 0 or count / count_unit == 0:
                     print("Strong")
+                    GPIO.output(StrongPin, GPIO.HIGH)
+                    time.sleep(interval / 2)
+                    GPIO.output(StrongPin, GPIO.LOW)
+                    time.sleep(interval / 2)
                 else:
                     print(1+count % 2)
+                    GPIO.output(MediumPin, GPIO.HIGH)
+                    time.sleep(interval / 2)
+                    GPIO.output(MediumPin, GPIO.LOW)
+                    time.sleep(interval / 2)
 
             elif meter_name == "triple":
                 if count % 3 == 0 or count / count_unit == 0:
                     print("Strong")
+                    GPIO.output(StrongPin, GPIO.HIGH)
+                    time.sleep(interval / 2)
+                    GPIO.output(StrongPin, GPIO.LOW)
+                    time.sleep(interval / 2)
                 else:
                     print(1 + count % 3)
+                    GPIO.output(MediumPin, GPIO.HIGH)
+                    time.sleep(interval / 2)
+                    GPIO.output(MediumPin, GPIO.LOW)
+                    time.sleep(interval / 2)
 
             else:
                 if count % 4 == 0 or (count+2) % count_unit == 0:
                     if (count+2) % count_unit == 0:
                         print("Medium Strong")
+                        GPIO.output(StrongPin, GPIO.HIGH)
+                        time.sleep(interval / 2)
+                        GPIO.output(StrongPin, GPIO.LOW)
+                        time.sleep(interval / 2)
                     else:
                         print("Strong")
+                        GPIO.output(StrongPin, GPIO.HIGH)
+                        time.sleep(interval / 2)
+                        GPIO.output(StrongPin, GPIO.LOW)
+                        time.sleep(interval / 2)
                 else:
                     print(1 + count % 4)
+                    GPIO.output(MediumPin, GPIO.HIGH)
+                    time.sleep(interval / 2)
+                    GPIO.output(MediumPin, GPIO.LOW)
+                    time.sleep(interval / 2)
 
         elif meter == "compound":
 
@@ -62,33 +93,66 @@ def play_metronome(bpm, time_signature):
                 if count % 3 == 0:
                     if count % beats_per_measure == 0 or (count+2) % (beats_per_measure) == 0:
                         print("Strong")
+                        GPIO.output(StrongPin, GPIO.HIGH)
+                        time.sleep(interval / 2)
+                        GPIO.output(StrongPin, GPIO.LOW)
+                        time.sleep(interval / 2)
                     else:
                         print("Medium Strong")
+                        GPIO.output(StrongPin, GPIO.HIGH)
+                        time.sleep(interval / 2)
+                        GPIO.output(StrongPin, GPIO.LOW)
+                        time.sleep(interval / 2)
                 else:
                     print(1 + count % beats_per_measure)
+                    GPIO.output(MediumPin, GPIO.HIGH)
+                    time.sleep(interval / 2)
+                    GPIO.output(MediumPin, GPIO.LOW)
+                    time.sleep(interval / 2)
 
             elif meter_name == "triple":
                 if count % 3 == 0:
                     if count % beats_per_measure == 0 or (count + 2) % (beats_per_measure) == 0:
                         print("Strong")
+                        GPIO.output(StrongPin, GPIO.HIGH)
+                        time.sleep(interval / 2)
+                        GPIO.output(StrongPin, GPIO.LOW)
+                        time.sleep(interval / 2)
                     else:
                         print("Medium Strong")
+                        GPIO.output(StrongPin, GPIO.HIGH)
+                        time.sleep(interval / 2)
+                        GPIO.output(StrongPin, GPIO.LOW)
+                        time.sleep(interval / 2)
                 else:
                     print(1 + count % beats_per_measure)
+                    GPIO.output(MediumPin, GPIO.HIGH)
+                    time.sleep(interval / 2)
+                    GPIO.output(MediumPin, GPIO.LOW)
+                    time.sleep(interval / 2)
             else:
                 if count % 3 ==0:
                     if count % beats_per_measure == 0 or (count + 2) % (beats_per_measure) == 0:
                         print("Strong")
+                        GPIO.output(StrongPin, GPIO.HIGH)
+                        time.sleep(interval / 2)
+                        GPIO.output(StrongPin, GPIO.LOW)
+                        time.sleep(interval / 2)
                     else:
                         print("Medium Strong")
+                        GPIO.output(StrongPin, GPIO.HIGH)
+                        time.sleep(interval / 2)
+                        GPIO.output(StrongPin, GPIO.LOW)
+                        time.sleep(interval / 2)
                 else:
                     print(1 + count % beats_per_measure)
+                    GPIO.output(MediumPin, GPIO.HIGH)
+                    time.sleep(interval / 2)
+                    GPIO.output(MediumPin, GPIO.LOW)
+                    time.sleep(interval / 2)
 
 
-        GPIO.output(RelayPin, GPIO.HIGH)
-        time.sleep(interval / 2)
-        GPIO.output(RelayPin, GPIO.LOW)
-        time.sleep(interval / 2)
+
 
         line_1 = "BPM: " + str(bpm)
         line_2 = "Time Sig: " + time_signature
@@ -98,7 +162,8 @@ def play_metronome(bpm, time_signature):
         count += 1
 
 def destroy():
-    GPIO.output(RelayPin, GPIO.LOW)
+    GPIO.output(StrongPin, GPIO.LOW)
+    GPIO.output(MediumPin, GPIO.LOW)
     GPIO.cleanup()
     LCD1602.clear()
 
